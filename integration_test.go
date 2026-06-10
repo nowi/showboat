@@ -225,6 +225,39 @@ func TestPop(t *testing.T) {
 	}
 }
 
+func TestReplay(t *testing.T) {
+	tmpBin := filepath.Join(t.TempDir(), "showboat")
+	build := exec.Command("go", "build", "-o", tmpBin, ".")
+	if out, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build failed: %s\n%s", err, out)
+	}
+
+	dir := t.TempDir()
+	file := filepath.Join(dir, "demo.md")
+	castFile := filepath.Join(dir, "demo.cast")
+
+	run(t, tmpBin, "init", file, "Replay Test")
+	run(t, tmpBin, "exec", file, "bash", "echo replay works")
+
+	run(t, tmpBin, "replay", file, "-o", castFile)
+
+	content, err := os.ReadFile(castFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(content), `"version":2`) {
+		t.Error("expected asciicast v2 header")
+	}
+	if !strings.Contains(string(content), `"$ "`) {
+		t.Error("expected cast to contain shell prompt")
+	}
+	if !strings.Contains(string(content), "replay works\\r\\n") {
+		t.Error("expected cast to contain command output")
+	}
+
+	run(t, tmpBin, "replay", file, "-o", castFile, "--verify")
+}
+
 func TestVersionFlagDefault(t *testing.T) {
 	tmpBin := filepath.Join(t.TempDir(), "showcase")
 	build := exec.Command("go", "build", "-o", tmpBin, ".")
