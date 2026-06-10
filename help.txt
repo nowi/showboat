@@ -13,6 +13,7 @@ Usage:
   showboat image <file> '![alt](path)'   Copy image with alt text
   showboat pop <file>                      Remove the most recent entry
   showboat verify <file> [--output <new>]  Re-run and diff all code blocks
+  showboat replay <file> [flags]           Convert demo to terminal recording
   showboat extract <file> [--filename <name>]  Emit commands to recreate file
 
 Global Options:
@@ -50,6 +51,29 @@ Verify:
   has changed; exits 0 if everything matches. Use --output <file> to write an
   updated copy of the document with the new outputs without modifying the
   original.
+
+Replay:
+  Converts a showboat document into a synthetic terminal recording that animates
+  each captured command and output as if run live. Default output is an
+  asciicast v2 file (.cast); use --format gif or --format mp4 with agg installed
+  to render an embeddable animation. Use --verify to diff against an existing
+  recording for CI gates.
+
+  Flags:
+    -o, --output <path>       Output path (default: <file>.cast)
+    --format cast|gif|mp4   Output format (gif/mp4 require agg on PATH)
+    --width <int>             Terminal columns (default 110)
+    --height <int>            Terminal rows (default 30)
+    --prompt <str>            Prompt string (default "$ ")
+    --notes hide|comments|narrate  How to render narration (default hide)
+    --speed <float>           Timing multiplier (default 1.0)
+    --typing-cps <int>        Chars/sec when typing commands (default 40)
+    --print-lps <int>         Lines/sec when printing output (default 50)
+    --pause-between <ms>      Pause after output (default 800)
+    --max-output-lines <int>  Truncate long output blocks (0 = no limit)
+    --theme <name>            Color theme for agg (default asciinema)
+    --loop                    Infinite loop for gif/mp4 output
+    --verify                  Fail if output differs from existing file
 
 Extract:
   Parses a document and prints the sequence of showboat CLI commands (one per

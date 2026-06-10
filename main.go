@@ -124,6 +124,21 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "replay":
+		if len(args) < 2 {
+			fmt.Fprintln(os.Stderr, "usage: showboat replay <file> [flags]")
+			os.Exit(1)
+		}
+		file, replayOpts, err := cmd.ParseReplayFlags(args[1:])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := cmd.Replay(file, replayOpts); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+
 	case "extract":
 		if len(args) < 2 {
 			fmt.Fprintln(os.Stderr, "usage: showboat extract <file> [--filename <name>]")
